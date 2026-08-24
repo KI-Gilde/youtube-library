@@ -4,6 +4,8 @@ A self-hosted YouTube channel library with automatic transcription and RAG-power
 
 Import a YouTube channel and the app downloads every video, transcribes it with Whisper, cleans up the transcript with an LLM, generates summaries, and indexes everything in a vector database. You can then browse your library, watch videos locally, search transcripts semantically, and chat with an assistant that recommends videos from the library based on their actual content.
 
+**Demo videos:** 🎬 [Product tour (English)](docs/media/yt-library-promo-en.mp4) · [Produkt-Tour (Deutsch)](docs/media/yt-library-promo-de.mp4)
+
 ## Features
 
 - **Channel import** — add a channel URL, all videos are discovered and queued automatically; a scheduler checks for new uploads periodically
