@@ -1,0 +1,96 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ytlib-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ytlib}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ytlib_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-youtube_library}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "9072:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ytlib}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ytlib-qdrant
+    ports:
+      - "9073:6333"
+      - "9074:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+
+  # llama.cpp Server for LLM (optional - start with: docker compose --profile llm up)
+  llama-server:
+    build:
+      context: ./llama-server
+      dockerfile: Dockerfile
+    container_name: ytlib-llama
+    profiles:
+      - llm
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - "9075:8080"
+    command: >
+      --model /models/${LLM_MODEL_PATH:-gpt-oss-20b.gguf}
+      --host 0.0.0.0
+      --port 8080
+      --ctx-size 4096
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ytlib-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ytlib}:${POSTGRES_PASSWORD:-ytlib_secret}@postgres:5432/${POSTGRES_DB:-youtube_library}
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      LLM_API_BASE: ${LLM_API_BASE:-http://llama-server:8080/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-sk-no-key-required}
+      LLM_CHAT_MODEL: ${LLM_CHAT_MODEL:-gpt-oss-20b}
+      LLM_UTILITY_MODEL: ${LLM_UTILITY_MODEL:-gpt-oss-20b}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
+      DATA_DIR: /data
+      WHISPER_MODEL: medium
+    volumes:
+      - ./data:/data
+      - ./models:/models:ro
+      - hf_cache:/root/.cache/huggingface
+    ports:
+      - "9071:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ytlib-frontend
+    environment:
+      VITE_API_URL: http://localhost:9071
+    ports:
+      - "9070:9070"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  hf_cache:

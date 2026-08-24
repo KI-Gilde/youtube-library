@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+
+# Data
+data/videos/
+data/audio/
+data/thumbnails/
+data/transcripts/
+data/transcripts_refined/
+models/*.gguf
+models/.cache/
+qdrant_data/
+postgres_data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
