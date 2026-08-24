@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     # Embedding model (served by the LLM API)
     embedding_model: str = "bge-m3"
 
+    # Language for LLM output (summaries, refinement, chat): "de" or "en"
+    language: str = "de"
+
     # Scheduler
     check_interval_hours: int = 1
 

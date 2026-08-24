@@ -8,6 +8,9 @@ RUN npm install
 
 # Copy source and build
 COPY . .
+# UI language is baked in at build time ("de" or "en")
+ARG VITE_LANGUAGE=de
+ENV VITE_LANGUAGE=$VITE_LANGUAGE
 RUN npm run build
 
 # Production stage

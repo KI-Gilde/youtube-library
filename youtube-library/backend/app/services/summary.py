@@ -10,20 +10,9 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models import Video, VideoStatus
 from app.services.llm import chat_completion
+from app.services.prompts import summary_prompt
 
 settings = get_settings()
-
-SUMMARY_PROMPT = """Du bist ein Experte fuer Zusammenfassungen von technischen Videos.
-Erstelle eine kurze Zusammenfassung des folgenden Video-Transkripts.
-
-Anforderungen:
-- Maximal 2-4 Saetze
-- Fokus auf Hauptthema und wichtigste Erkenntnisse
-- Klare, praegnante Sprache
-- Antworte NUR mit der Zusammenfassung, keine Erklaerungen
-
-Transkript:
-{transcript}"""
 
 
 async def generate_summary_with_llm(transcript: str) -> str | None:
@@ -34,7 +23,7 @@ async def generate_summary_with_llm(transcript: str) -> str | None:
     try:
         content = await chat_completion(
             messages=[
-                {"role": "user", "content": SUMMARY_PROMPT.format(transcript=truncated)}
+                {"role": "user", "content": summary_prompt().format(transcript=truncated)}
             ],
             model=settings.llm_utility_model,
             temperature=0.3,

@@ -3,14 +3,15 @@ import { MessageSquare, Download, BookOpen, Terminal } from 'lucide-react'
 import Import from './pages/Import'
 import Library from './pages/Library'
 import Chat from './pages/Chat'
+import { t } from './i18n'
 
 function App() {
   const location = useLocation()
 
   const navItems = [
-    { path: '/import', icon: Download, label: 'Import', index: '01' },
-    { path: '/', icon: BookOpen, label: 'Bibliothek', index: '02' },
-    { path: '/chat', icon: MessageSquare, label: 'Chat', index: '03' },
+    { path: '/import', icon: Download, label: t.navImport, index: '01' },
+    { path: '/', icon: BookOpen, label: t.navLibrary, index: '02' },
+    { path: '/chat', icon: MessageSquare, label: t.navChat, index: '03' },
   ]
 
   return (

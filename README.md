@@ -56,6 +56,7 @@ All settings live in `youtube-library/.env` (see `.env.example`):
 | `LLM_UTILITY_MODEL` | `gpt-oss-20b` | Faster model for transcript refinement and summaries |
 | `EMBEDDING_MODEL` | `bge-m3` | Embedding model served by the same API |
 | `WHISPER_MODEL` | `medium` | Local Whisper size: tiny, base, small, medium, large |
+| `LANGUAGE` | `de` | App language (`de` or `en`) for the web UI and all LLM output — summaries, transcript refinement, chat answers. Rebuild after changing. |
 | `POSTGRES_*` | see example | Database credentials |
 
 Without an external API you can start the bundled llama.cpp server (`docker compose --profile llm up -d`, place a GGUF file in `youtube-library/models/`), but note it serves chat only — embeddings still need an endpoint that provides them.

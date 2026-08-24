@@ -4,6 +4,7 @@ import { Search, Loader2, Play, X } from 'lucide-react'
 import { channelsApi, videosApi, Video as VideoType, VideoSearchResult } from '../api/client'
 import VideoCard from '../components/VideoCard'
 import VideoModal from '../components/VideoModal'
+import { t } from '../i18n'
 
 
 // Search Result Card Component
@@ -36,7 +37,7 @@ function SearchResultCard({ result, onClick }: { result: VideoSearchResult; onCl
             <span
               className="mono text-[11px] font-semibold flex-shrink-0 px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-0)]"
               style={{ color: scoreColor }}
-              title="Ähnlichkeits-Score"
+              title={t.similarityScore}
             >
               {result.score.toFixed(2)}
             </span>
@@ -98,9 +99,9 @@ function Library() {
     <div className="p-4 md:p-8 animate-fade-in">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl mb-1">Bibliothek</h1>
+        <h1 className="text-2xl mb-1">{t.libraryTitle}</h1>
         <p className="mono text-xs text-[var(--text-muted)]">
-          {videos.length} videos indexiert
+          {videos.length} {t.videosIndexed}
         </p>
       </div>
 
@@ -118,7 +119,7 @@ function Library() {
             </div>
             <input
               type="text"
-              placeholder="Suche nach Themen, Begriffen oder Fragen..."
+              placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input-field w-full pl-9 pr-9 py-2.5"
@@ -142,7 +143,7 @@ function Library() {
             onChange={(e) => setSelectedChannel(e.target.value)}
             className="select-field w-full md:w-auto md:min-w-[200px]"
           >
-            <option value="">Alle Kanäle</option>
+            <option value="">{t.allChannels}</option>
             {channels.map((channel) => (
               <option key={channel.id} value={channel.id}>
                 {channel.name}
@@ -154,7 +155,7 @@ function Library() {
         {/* Search hint */}
         {!isSearching && (
           <p className="mono text-[11px] text-[var(--text-muted)] mt-2.5">
-            <span className="text-[var(--accent)]">//</span> semantische Suche über alle Transkripte — findet Bedeutung, nicht nur Wörter
+            <span className="text-[var(--accent)]">//</span> {t.searchHint}
           </p>
         )}
       </div>
@@ -164,10 +165,10 @@ function Library() {
         // Search Results
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <h2 className="t-label">Suchergebnisse</h2>
+            <h2 className="t-label">{t.searchResults}</h2>
             {searchResults.length > 0 && (
               <span className="mono text-[11px] text-[var(--accent)]">
-                {searchResults.length} Treffer
+                {searchResults.length} {t.hits}
               </span>
             )}
           </div>
@@ -175,14 +176,14 @@ function Library() {
           {searchLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-6 h-6 animate-spin text-[var(--accent)] mb-3" />
-              <p className="mono text-xs text-[var(--text-secondary)]">Durchsuche Transkripte...</p>
+              <p className="mono text-xs text-[var(--text-secondary)]">{t.searchingTranscripts}</p>
             </div>
           ) : searchResults.length === 0 ? (
             <div className="panel text-center py-16">
               <Search className="w-8 h-8 text-[var(--text-muted)] mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Keine Treffer</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t.noHits}</h3>
               <p className="mono text-xs text-[var(--text-muted)]">
-                Keine Videos gefunden für "{debouncedSearch}"
+                {t.noVideosFoundFor} "{debouncedSearch}"
               </p>
             </div>
           ) : (
@@ -205,7 +206,7 @@ function Library() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <h2 className="t-label">
-              Alle Videos
+              {t.allVideos}
               {selectedChannel && channels.find(c => c.id === selectedChannel) && (
                 <span className="text-[var(--accent)] ml-2 normal-case">
                   / {channels.find(c => c.id === selectedChannel)?.name}
@@ -220,9 +221,9 @@ function Library() {
             </div>
           ) : videos.length === 0 ? (
             <div className="panel text-center py-16">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Keine fertigen Videos</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t.noDoneVideos}</h3>
               <p className="mono text-xs text-[var(--text-muted)]">
-                Videos erscheinen hier nach der Verarbeitung
+                {t.videosAppearHere}
               </p>
             </div>
           ) : (

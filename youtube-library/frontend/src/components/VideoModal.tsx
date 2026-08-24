@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { X, ExternalLink, FileText, Loader2 } from 'lucide-react'
 import { Video, videosApi } from '../api/client'
+import { t } from '../i18n'
 
 interface VideoModalProps {
   video: Video
@@ -72,7 +73,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
             </video>
           ) : (
             <div className="w-full h-full flex items-center justify-center mono text-sm text-[var(--text-muted)]">
-              Video nicht verfügbar
+              {t.videoUnavailable}
             </div>
           )}
         </div>
@@ -101,7 +102,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                Transkript
+                {t.transcript}
               </button>
             </div>
           </div>
@@ -109,7 +110,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
           {/* Summary */}
           {video.summary && (
             <div className="mb-4">
-              <h3 className="t-label mb-2">Zusammenfassung</h3>
+              <h3 className="t-label mb-2">{t.summary}</h3>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{video.summary}</p>
             </div>
           )}
@@ -117,18 +118,18 @@ function VideoModal({ video, onClose }: VideoModalProps) {
           {/* Transcript */}
           {showTranscript && (
             <div className="mt-4 p-4 rounded border border-[var(--border)] bg-[var(--bg-0)]">
-              <h3 className="t-label mb-3">Transkript</h3>
+              <h3 className="t-label mb-3">{t.transcript}</h3>
               {transcriptLoading ? (
                 <div className="flex items-center gap-2 mono text-xs text-[var(--text-secondary)]">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Wird geladen...
+                  {t.loading}
                 </div>
               ) : transcriptData?.data.transcript ? (
                 <div className="mono text-xs text-[var(--text-secondary)] whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed">
                   {transcriptData.data.transcript}
                 </div>
               ) : (
-                <p className="mono text-xs text-[var(--text-muted)]">Kein Transkript verfügbar</p>
+                <p className="mono text-xs text-[var(--text-muted)]">{t.noTranscript}</p>
               )}
             </div>
           )}

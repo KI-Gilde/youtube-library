@@ -11,14 +11,15 @@ import {
 import { channelsApi, videosApi, Video as VideoType } from '../api/client'
 import VideoCard from '../components/VideoCard'
 import VideoModal from '../components/VideoModal'
+import { t } from '../i18n'
 
 // Pipeline steps in processing order, with short technical codes
 const PIPELINE_STEPS = [
-  { key: 'downloading', code: 'DL', label: 'Download' },
-  { key: 'transcribing', code: 'ASR', label: 'Transkription' },
-  { key: 'refining', code: 'REF', label: 'Refinement' },
-  { key: 'summarizing', code: 'SUM', label: 'Zusammenfassung' },
-  { key: 'embedding', code: 'EMB', label: 'Embedding' },
+  { key: 'downloading', code: 'DL', label: t.stepLabels.downloading },
+  { key: 'transcribing', code: 'ASR', label: t.stepLabels.transcribing },
+  { key: 'refining', code: 'REF', label: t.stepLabels.refining },
+  { key: 'summarizing', code: 'SUM', label: t.stepLabels.summarizing },
+  { key: 'embedding', code: 'EMB', label: t.stepLabels.embedding },
 ]
 
 function Import() {
@@ -126,9 +127,9 @@ function Import() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl mb-1">Import</h1>
+          <h1 className="text-2xl mb-1">{t.importTitle}</h1>
           <p className="mono text-xs text-[var(--text-muted)]">
-            Kanäle & Playlists verwalten, Videos verarbeiten
+            {t.importSubtitle}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -141,19 +142,19 @@ function Import() {
               {startProcessingMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Wird gestartet...
+                  {t.starting}
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4" />
-                  Verarbeitung starten ({stats.by_status.pending})
+                  {t.startProcessing} ({stats.by_status.pending})
                 </>
               )}
             </button>
           )}
           <button onClick={() => setShowAddModal(true)} className="btn-primary">
             <Plus className="w-4 h-4" />
-            Kanal hinzufügen
+            {t.addChannel}
           </button>
         </div>
       </div>
@@ -162,19 +163,19 @@ function Import() {
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           <div className="stat-card">
-            <div className="stat-label mb-2">Gesamt</div>
+            <div className="stat-label mb-2">{t.statTotal}</div>
             <div className="stat-value text-[var(--text-primary)]">{stats.total_videos}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label mb-2">Fertig</div>
+            <div className="stat-label mb-2">{t.statDone}</div>
             <div className="stat-value text-[var(--ok)]">{stats.by_status.done || 0}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label mb-2">In Arbeit</div>
+            <div className="stat-label mb-2">{t.statProcessing}</div>
             <div className="stat-value text-[var(--info)]">{processingCount}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label mb-2">Warteschlange</div>
+            <div className="stat-label mb-2">{t.statQueued}</div>
             <div className="stat-value text-[var(--warn)]">{stats.by_status.pending || 0}</div>
           </div>
         </div>
@@ -192,7 +193,7 @@ function Import() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent)]" />
                 </span>
                 <span className="t-label text-[var(--accent)]">
-                  {currentStepIndex >= 0 ? PIPELINE_STEPS[currentStepIndex].label : 'Verarbeitung'}
+                  {currentStepIndex >= 0 ? PIPELINE_STEPS[currentStepIndex].label : t.processingFallback}
                 </span>
                 <span className="mono text-[11px] text-[var(--text-muted)]">
                   {processingStatus.current_video.channel_name}
@@ -236,7 +237,7 @@ function Import() {
         {/* Channels List */}
         <div className="panel">
           <div className="px-4 py-3 border-b border-[var(--border)]">
-            <h2 className="t-label">Kanäle</h2>
+            <h2 className="t-label">{t.channels}</h2>
           </div>
           <div className="p-3">
             {channelsLoading ? (
@@ -245,9 +246,9 @@ function Import() {
               </div>
             ) : channels.length === 0 ? (
               <div className="text-center py-12">
-                <p className="mono text-xs text-[var(--text-muted)] mb-4">Keine Kanäle vorhanden</p>
+                <p className="mono text-xs text-[var(--text-muted)] mb-4">{t.noChannels}</p>
                 <button onClick={() => setShowAddModal(true)} className="btn-secondary text-xs">
-                  Kanal hinzufügen
+                  {t.addChannel}
                 </button>
               </div>
             ) : (
@@ -278,19 +279,19 @@ function Import() {
                             refreshChannelMutation.mutate(channel.id)
                           }}
                           className="p-1.5 rounded hover:bg-[var(--bg-3)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                          title="Aktualisieren"
+                          title={t.refresh}
                         >
                           <RefreshCw className={`w-3.5 h-3.5 ${refreshChannelMutation.isPending ? 'animate-spin' : ''}`} />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            if (confirm('Kanal wirklich löschen?')) {
+                            if (confirm(t.confirmDeleteChannel)) {
                               deleteChannelMutation.mutate(channel.id)
                             }
                           }}
                           className="p-1.5 rounded hover:bg-[var(--bg-3)] text-[var(--text-muted)] hover:text-[var(--err)] transition-colors"
-                          title="Löschen"
+                          title={t.delete}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -307,7 +308,7 @@ function Import() {
         <div className="lg:col-span-2 panel">
           <div className="flex justify-between items-center px-4 py-3 border-b border-[var(--border)]">
             <h2 className="t-label">
-              Import-Warteschlange
+              {t.importQueue}
               {selectedChannel && (
                 <span className="text-[var(--accent)] ml-2 normal-case">
                   / {channels.find(c => c.id === selectedChannel)?.name}
@@ -316,7 +317,7 @@ function Import() {
             </h2>
             {selectedChannel && (
               <button onClick={() => setSelectedChannel(null)} className="btn-ghost text-xs">
-                Alle anzeigen
+                {t.showAll}
               </button>
             )}
           </div>
@@ -327,7 +328,7 @@ function Import() {
               </div>
             ) : videos.length === 0 ? (
               <div className="text-center py-16">
-                <p className="mono text-xs text-[var(--text-muted)]">Keine Videos vorhanden</p>
+                <p className="mono text-xs text-[var(--text-muted)]">{t.noVideos}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto p-1">
@@ -349,7 +350,7 @@ function Import() {
         <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 animate-fade-in p-4">
           <div className="panel w-full max-w-[420px]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-2)]">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Kanal hinzufügen</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t.addChannel}</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="p-1.5 rounded hover:bg-[var(--bg-3)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
@@ -360,10 +361,10 @@ function Import() {
 
             <div className="p-4">
               <div className="mb-4">
-                <label className="t-label block mb-2">YouTube Kanal- oder Playlist-URL</label>
+                <label className="t-label block mb-2">{t.channelUrlLabel}</label>
                 <input
                   type="text"
-                  placeholder="https://youtube.com/@KanalName"
+                  placeholder={t.channelUrlPlaceholder}
                   value={newChannelUrl}
                   onChange={(e) => setNewChannelUrl(e.target.value)}
                   className="input-field w-full"
@@ -372,11 +373,11 @@ function Import() {
               </div>
 
               <div className="mb-5">
-                <label className="t-label block mb-2">Nur die neuesten N Videos (optional)</label>
+                <label className="t-label block mb-2">{t.latestNLabel}</label>
                 <input
                   type="number"
                   min={1}
-                  placeholder="z.B. 10 — leer = alle"
+                  placeholder={t.latestNPlaceholder}
                   value={newChannelMaxVideos}
                   onChange={(e) => setNewChannelMaxVideos(e.target.value)}
                   className="input-field w-full"
@@ -385,7 +386,7 @@ function Import() {
 
               <div className="flex justify-end gap-2">
                 <button onClick={() => setShowAddModal(false)} className="btn-ghost">
-                  Abbrechen
+                  {t.cancel}
                 </button>
                 <button
                   onClick={() =>
@@ -400,10 +401,10 @@ function Import() {
                   {addChannelMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Wird hinzugefügt...
+                      {t.adding}
                     </>
                   ) : (
-                    'Hinzufügen'
+                    t.add
                   )}
                 </button>
               </div>

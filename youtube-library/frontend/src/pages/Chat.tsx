@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Send, ExternalLink, Bot, RotateCcw, Terminal } from 'lucide-react'
 import { chatApi, channelsApi, ChatMessage, ChatSource } from '../api/client'
+import { t } from '../i18n'
 
 interface Message extends ChatMessage {
   sources?: ChatSource[]
@@ -74,7 +75,7 @@ function Chat() {
       console.error('Chat error:', error)
       updateLastMessage((m) => ({
         ...m,
-        content: m.content || 'Entschuldigung, es ist ein Fehler aufgetreten.',
+        content: m.content || t.chatError,
       }))
     } finally {
       setIsLoading(false)
@@ -96,14 +97,14 @@ function Chat() {
       {/* Header */}
       <div className="px-4 md:px-6 py-3 border-b border-[var(--border)] bg-[var(--bg-1)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-lg">Chat</h1>
-          <p className="mono text-[11px] text-[var(--text-muted)]">RAG über {channels.reduce((n, c) => n + c.video_count, 0)} Videos</p>
+          <h1 className="text-lg">{t.chatTitle}</h1>
+          <p className="mono text-[11px] text-[var(--text-muted)]">{t.ragOver} {channels.reduce((n, c) => n + c.video_count, 0)} {t.videosWord}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {messages.length > 0 && (
             <button onClick={clearChat} className="btn-ghost">
               <RotateCcw className="w-3.5 h-3.5" />
-              Neuer Chat
+              {t.newChat}
             </button>
           )}
           <select
@@ -111,7 +112,7 @@ function Chat() {
             onChange={(e) => setSelectedChannel(e.target.value)}
             className="select-field min-w-[180px]"
           >
-            <option value="">Alle Kanäle</option>
+            <option value="">{t.allChannels}</option>
             {channels.map((channel) => (
               <option key={channel.id} value={channel.id}>
                 {channel.name}
@@ -128,18 +129,14 @@ function Chat() {
             <div className="w-14 h-14 rounded border border-[var(--border-strong)] bg-[var(--bg-1)] flex items-center justify-center mb-5">
               <Terminal className="w-6 h-6 text-[var(--accent)]" />
             </div>
-            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Frag deine Bibliothek</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t.askYourLibrary}</h2>
             <p className="text-sm text-[var(--text-secondary)] text-center max-w-md">
-              Fragen werden per semantischer Suche gegen die Transkripte beantwortet — mit Quellenangabe.
+              {t.chatIntro}
             </p>
 
             {/* Example prompts */}
             <div className="mt-6 flex flex-wrap gap-2 justify-center max-w-xl">
-              {[
-                'Was ist ein AI Agent?',
-                'Erkläre Model Collapse',
-                'Was bedeutet RAG?',
-              ].map((prompt) => (
+              {t.examplePrompts.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => setInput(prompt)}
@@ -173,7 +170,7 @@ function Chat() {
                   }`}
                 >
                   {message.role === 'assistant' && message.content === '' ? (
-                    <span className="mono text-xs text-[var(--text-muted)] cursor-blink">Suche Kontext</span>
+                    <span className="mono text-xs text-[var(--text-muted)] cursor-blink">{t.searchingContext}</span>
                   ) : (
                     <div
                       className={`whitespace-pre-wrap leading-relaxed text-sm ${
@@ -187,7 +184,7 @@ function Chat() {
                   {/* Sources */}
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-[var(--border)]">
-                      <div className="t-label mb-2">Quellen</div>
+                      <div className="t-label mb-2">{t.sources}</div>
                       <div className="space-y-1">
                         {message.sources.map((source, i) => (
                           <a
@@ -209,7 +206,7 @@ function Chat() {
 
                 {message.role === 'user' && (
                   <div className="w-8 h-8 rounded border border-[var(--border-strong)] bg-[var(--bg-2)] flex items-center justify-center flex-shrink-0">
-                    <span className="mono text-[10px] font-semibold text-[var(--text-secondary)]">DU</span>
+                    <span className="mono text-[10px] font-semibold text-[var(--text-secondary)]">{t.you}</span>
                   </div>
                 )}
               </div>
@@ -227,7 +224,7 @@ function Chat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="> Stelle eine Frage..."
+            placeholder={t.askPlaceholder}
             rows={1}
             className="input-field flex-1 resize-none min-h-[44px] py-3"
           />

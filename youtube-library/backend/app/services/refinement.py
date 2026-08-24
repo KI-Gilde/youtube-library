@@ -5,31 +5,9 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models import Video, VideoStatus
 from app.services.llm import chat_completion
+from app.services.prompts import refine_prompt
 
 settings = get_settings()
-
-SYSTEM_PROMPT = """Du bist ein Experte fuer die Korrektur von automatisch transkribierten deutschen YouTube-Videos ueber Technologie und KI.
-
-Deine Aufgabe: Korrigiere Transkriptionsfehler im folgenden Text.
-
-Haeufige Fehler die du korrigieren sollst:
-- "Olama", "Ullama", "Olamalist" → "Ollama", "ollama list"
-- "Evil Rate", "Evil" → "Eval Rate", "Eval" (Evaluation)
-- "Togen", "Togens" → "Token", "Tokens"
-- "Nimotron", "Nemo-Tron" → "Nemotron"
-- "GMA", "GMA3" → "Gemma", "Gemma 3"
-- "JGBT", "JetGBT" → "ChatGPT"
-- "wirkflos" → "Workflows"
-- "Lenden" → "Enter"
-- "Boos" → "--verbose"
-- "Kommando-Teile" → "Kommandozeile"
-- Andere offensichtliche Hoerfehler bei technischen Begriffen
-
-Regeln:
-1. Korrigiere NUR offensichtliche Transkriptionsfehler
-2. Aendere NICHT den Inhalt, Stil oder die Struktur
-3. Behalte alle Saetze und Absaetze bei
-4. Antworte NUR mit dem korrigierten Text, keine Erklaerungen"""
 
 
 def chunk_text(text: str, max_chars: int = 4000) -> list[str]:
@@ -61,7 +39,7 @@ async def refine_with_llm(text: str) -> str:
         try:
             refined = await chat_completion(
                 messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": refine_prompt()},
                     {"role": "user", "content": chunk},
                 ],
                 model=settings.llm_utility_model,
