@@ -111,16 +111,15 @@ Antworte immer auf Deutsch und sei enthusiastisch!"""
 
 def build_messages(query: str, context: str, history: list[ChatMessage]) -> list[dict]:
     """Build messages for the chat completion API."""
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT}
-    ]
-
-    # Add context as system message
+    # Context is merged into the single leading system message — strict
+    # OpenAI-compatible endpoints reject system messages after position 0.
+    system_content = SYSTEM_PROMPT
     if context:
-        messages.append({
-            "role": "system",
-            "content": f"Kontext aus Video-Transkripten:\n\n{context}"
-        })
+        system_content += f"\n\nKontext aus Video-Transkripten:\n\n{context}"
+
+    messages = [
+        {"role": "system", "content": system_content}
+    ]
 
     # Add conversation history
     for msg in history[-4:]:
